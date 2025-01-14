@@ -1,4 +1,9 @@
+const { default: puppeteer } = require('puppeteer');
 
+const scrapper = async (url) => {
+  const browser = await puppeteer.launch({ headless: false });
+  const page = await browser.newPage();
+  await page.goto(url);
+};
 
-
- https://www.sensacine.com/peliculas/mejores-peliculas/
+scrapper('https://www.sensacine.com/peliculas/mejores-peliculas/');
