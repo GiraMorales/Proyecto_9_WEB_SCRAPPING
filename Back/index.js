@@ -1,7 +1,8 @@
-// const { scrapper } = require('./src/scrapper/scrapper');
+const { scrapper } = require('./src/scrapper/scrapper');
 const express = require('express');
 const { default: puppeteer, Browser } = require('puppeteer');
 const { connectDB } = require('./src/config/db');
+// const { scrapePeliculas }= require('./src/scrapper/scrapper');
 
 const app = express();
 connectDB();
