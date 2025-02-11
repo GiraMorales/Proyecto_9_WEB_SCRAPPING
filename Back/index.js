@@ -39,20 +39,31 @@ const repeat = async (page, peliculasArray) => {
   const peliculas = await page.$$('li.mdl');
   //después hacemos un blucle para recorrer todos los datos
   for (const pelicula of peliculas) {
+    let title;
+    let portada;
+    let sipnosis;
     //vamos a sacar el titulo de la pelicula
-    const title = await pelicula.$eval(
-      '.xXx.thumbnail-container.thumbnail-link',
-      (el) => el.title
+    //primero selecionamos donde esta el titulo
+    const titleElement = await pelicula.$(
+      '.xXx.thumbnail-container.thumbnail-link'
     );
+    //después sacamos el titulo
+    if (titleElement) {
+      title = await titleElement.evaluate((el) => el.title);
+    }
+
     //vamos a sacar la portada de la pelicula
-    const portada = await pelicula.$eval(
-      'div.card.entity-card.entity-card-list.cf > figure.thumbnail  > a.xXx.thumbnail-container.thumbnail-link > img.thumbnail-img',
-      (el) => el.src
+    const portadaElement = await pelicula.$(
+      'div.card.entity-card.entity-card-list.cf > figure.thumbnail  > a.xXx.thumbnail-container.thumbnail-link > img.thumbnail-img'
     );
+    if (portadaElement) {
+      portada = await portadaElement.evaluate((el) => el.src);
+    }
     //vamos a sacar la sipnosis de la pelicula
-    const sipnosis = await pelicula.$eval('div.content-txt', (el) =>
-      el.textContent.trim()
-    );
+    const sipnosisElement = await pelicula.$('div.content-txt');
+    if (sipnosisElement) {
+      sipnosis = await sipnosisElement.evaluate((el) => el.textContent.trim());
+    }
 
     const peliData = {
       title,
