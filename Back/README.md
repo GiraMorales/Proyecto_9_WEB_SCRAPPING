@@ -95,6 +95,9 @@ En nuestro fichero index.js
   c. Se navega a la URL especifica (filmaffinity en este caso) y se realiza una búsqueda en el sitio utilizando la palabra "peliculas".
   d. Se esprea a que la pagina se cargue y se hace un scroll para ver más resultados de búsqueda.
   e. Utilizando el método ".$$eval" de Puppeteer se extraen los títulos, portadas y sipnosis de las películas de la página.
+  f. Se crea un array con los datos extraídos y se convierte en un objeto JSON.
+  g. Se guarda el objeto JSON en la base de datos MongoDB.
+  h. Se cierra el navegador y se imprime un mensaje de éxito.
 
 ### añadir los scripts
 
