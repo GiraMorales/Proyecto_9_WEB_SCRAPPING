@@ -2,6 +2,7 @@ const puppeteer = require('puppeteer');
 
 const scrap = async () => {
   const url = 'https://www.sensacine.com/peliculas/en-cartelera/cines/';
+
   // nuestro buscador
   const browser = await puppeteer.launch({
     headless: false,
