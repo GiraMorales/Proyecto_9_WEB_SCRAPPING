@@ -11,9 +11,68 @@ const scrap = async (url) => {
   // creamos la pagina
   const page = await browser.newPage();
   await page.goto(url);
+  // await page.goto(url, { waitUntil: 'domcontentloaded' });
 
-  // si la pagina tiene un boton de aceptar cookies hacemos un codigo que lo acepte
-  await page.$eval('.css-xlut8b', (el) => el.click());
+  // Aceptar cookies si el botón existe
+  const button = await page.$('.jad_cmp_paywall_button-cookies');
+  if (button) {
+    await button.click();
+    console.log('Cookies aceptadas.');
+  } else {
+    console.log('No se encontró el botón de cookies.');
+  }
+
+  const peliculasArray = [];
+  //funcion que le ira dando al botón siguiente hasta que no haya más
+  await repeat(page, peliculasArray);
+  console.log(peliculasArray);
+  //cerramos el navegador
+  await browser.close();
 };
 
-scrap('https://www.filmaffinity.com/es/topcat.php?id=new_th_es');
+//recibimos la pagina y el array de peliculas
+const repeat = async (page, peliculasArray) => {
+  //vamos rellenando el array con los datos de las peliculas
+  //esperamos a que cargue la pagina
+  await page.waitForSelector('li.mdl', { timeout: 10000 });
+  //primero selecionamos donde esta todos los datos
+  const peliculas = await page.$$('li.mdl');
+  //después hacemos un blucle para recorrer todos los datos
+  for (const pelicula of peliculas) {
+    //vamos a sacar el titulo de la pelicula
+    const title = await pelicula.$eval(
+      '.xXx.thumbnail-container.thumbnail-link',
+      (el) => el.title
+    );
+    //vamos a sacar la portada de la pelicula
+    const portada = await pelicula.$eval(
+      'div.card.entity-card.entity-card-list.cf > figure.thumbnail  > a.xXx.thumbnail-container.thumbnail-link > img.thumbnail-img',
+      (el) => el.src
+    );
+    //vamos a sacar la sipnosis de la pelicula
+    const sipnosis = await pelicula.$eval('div.content-txt', (el) =>
+      el.textContent.trim()
+    );
+
+    const peliData = {
+      title,
+      portada,
+      sipnosis
+    };
+    peliculasArray.push(peliData);
+    //console.log(peliData);
+    const nextButton = await page.$(
+      'a.xXx.button.button-md.button-primary-full.button-right'
+    );
+    if (nextButton) {
+      await nextButton.click();
+      //esperamos a que cargue la pagina
+      await repeat(page, peliculasArray);
+    } else {
+      console.log('No hay más películas.');
+      return;
+    }
+  }
+};
+
+scrap('https://www.sensacine.com/peliculas/en-cartelera/cines/');
