@@ -72,18 +72,19 @@ const repeat = async (page, peliculasArray) => {
     };
     peliculasArray.push(peliData);
     //console.log(peliData);
-    const nextButton = await page.$(
-      'a.xXx.button.button-md.button-primary-full.button-right'
-    );
-    if (nextButton) {
-      await nextButton.click();
-      //esperamos a que cargue la pagina
-      await repeat(page, peliculasArray);
-    } else {
-      console.log('No hay más películas.');
-      return;
-    }
+    break;
   }
+  const nextButton = await page.$(
+    'a.xXx.button.button-md.button-primary-full.button-right'
+  );
+  if (nextButton) {
+    await nextButton.click();
+    //esperamos a que cargue la pagina
+    await repeat(page, peliculasArray);
+  } else {
+    console.log('No hay más películas.');
+  }
+  console.log(peliculasArray);
 };
 
 scrap('https://www.sensacine.com/peliculas/en-cartelera/cines/');
