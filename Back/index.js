@@ -1,90 +1,28 @@
-const puppeteer = require('puppeteer');
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const { connectDB } = require('./src/config/db');
+const { scrap } = require('./src/scrapper/scrapper');
 
-const scrap = async (url) => {
-  // nuestro buscador
-  const browser = await puppeteer.launch({
-    headless: false,
-    //para que se muestre en pantalla completa
-    defaultViewport: null,
-    args: ['--start-maximized']
-  });
-  // creamos la pagina
-  const page = await browser.newPage();
-  await page.goto(url);
-  // await page.goto(url, { waitUntil: 'domcontentloaded' });
+const PORT = 3000;
 
-  // Aceptar cookies si el botón existe
-  const button = await page.$('.jad_cmp_paywall_button-cookies');
-  if (button) {
-    await button.click();
-    console.log('Cookies aceptadas.');
-  } else {
-    console.log('No se encontró el botón de cookies.');
+const app = express();
+connectDB();
+app.use(cors());
+
+app.get('/api/v1/peliculas', async (req, res) => {
+  try {
+    const peliculas = await scrap();
+    res.status(200).json(peliculas);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener las películas' });
   }
+});
 
-  const peliculasArray = [];
-  //funcion que le ira dando al botón siguiente hasta que no haya más
-  await repeat(page, peliculasArray);
-  console.log(peliculasArray);
-  //cerramos el navegador
-  await browser.close();
-};
+app.use('*', (req, res, next) => {
+  return res.status(400).json('Ruta no encontrada 🤨');
+});
 
-//recibimos la pagina y el array de peliculas
-const repeat = async (page, peliculasArray) => {
-  //vamos rellenando el array con los datos de las peliculas
-  //esperamos a que cargue la pagina
-  await page.waitForSelector('li.mdl', { timeout: 10000 });
-  //primero selecionamos donde esta todos los datos
-  const peliculas = await page.$$('li.mdl');
-  //después hacemos un blucle para recorrer todos los datos
-  for (const pelicula of peliculas) {
-    let title;
-    let portada;
-    let sipnosis;
-    //vamos a sacar el titulo de la pelicula
-    //primero selecionamos donde esta el titulo
-    const titleElement = await pelicula.$(
-      '.xXx.thumbnail-container.thumbnail-link'
-    );
-    //después sacamos el titulo
-    if (titleElement) {
-      title = await titleElement.evaluate((el) => el.title);
-    }
-
-    //vamos a sacar la portada de la pelicula
-    const portadaElement = await pelicula.$(
-      'div.card.entity-card.entity-card-list.cf > figure.thumbnail  > a.xXx.thumbnail-container.thumbnail-link > img.thumbnail-img'
-    );
-    if (portadaElement) {
-      portada = await portadaElement.evaluate((el) => el.src);
-    }
-    //vamos a sacar la sipnosis de la pelicula
-    const sipnosisElement = await pelicula.$('div.content-txt');
-    if (sipnosisElement) {
-      sipnosis = await sipnosisElement.evaluate((el) => el.textContent.trim());
-    }
-
-    const peliData = {
-      title,
-      portada,
-      sipnosis
-    };
-    peliculasArray.push(peliData);
-    //console.log(peliData);
-    break;
-  }
-  const nextButton = await page.$(
-    'a.xXx.button.button-md.button-primary-full.button-right'
-  );
-  if (nextButton) {
-    await nextButton.click();
-    //esperamos a que cargue la pagina
-    await repeat(page, peliculasArray);
-  } else {
-    console.log('No hay más películas.');
-  }
-  console.log(peliculasArray);
-};
-
-scrap('https://www.sensacine.com/peliculas/en-cartelera/cines/');
+app.listenerCount(PORT, () => {
+  console.log('Puerto 30000 levantado');
+});
