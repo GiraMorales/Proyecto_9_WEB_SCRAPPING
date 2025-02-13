@@ -1,37 +1,37 @@
 const getPeliculas = async () => {
+  const input = document.querySelector('#buscar');
+  console.log(button.value);
   try {
-    const res = await fetch('http://localhost:3000/api/peliculas'); // Asegúrate que la URL sea la correcta
+    const res = await fetch(
+      `http://localhost:3000/api/v1/peliculas${input.value}`
+    );
+    if (!res.ok) throw new Error('Error al obtener las películas');
     const peliculas = await res.json();
-
-    const container = document.getElementById('peliculas-container');
-    container.innerHTML = ''; // Limpiar antes de mostrar nuevas películas
-
-    peliculas.forEach((pelicula) => {
-      const div = document.createElement('div');
-      div.classList.add('pelicula');
-
-      div.innerHTML = `
-        <img src="${pelicula.Portada}" alt="${pelicula.Titulo}">
-        <h3>${pelicula.Titulo}</h3>
-        <p><strong>Género:</strong> ${pelicula.Genero.join(', ')}</p>
-        <p>${pelicula.Sinopsis}</p>
-      `;
-
-      container.appendChild(div);
-    });
+    console.log(peliculas);
+    pintarPeliculas(peliculas);
   } catch (error) {
-    console.error('Error al obtener películas:', error);
+    console.error(error);
   }
 };
 
-// Asociar la función al botón
-document.getElementById('buscar').addEventListener('click', getPeliculas);
+const pintarPeliculas = (peliculas) => {
+  const divPeliculas = document.querySelector('.peliculas');
+  if (!divPeliculas) {
+    console.error('No se encontró el contenedor de películas en el HTML');
+    return;
+  }
+  // Limpiar antes de agregar nuevas películas
+  divPeliculas.innerHTML = '';
+  for (const pelicula of peliculas) {
+    divPeliculas.innerHTML += `
+    <div class= "pelicula">
+    <h3>${pelicula.Titulo}</h3>
+    <img src="${pelicula.Portada}" alt="${pelicula.Titulo}">
+     <p><strong>Género:</strong> ${pelicula.Genero.join(', ')}</p>
+     <p>${pelicula.Sinopsis}</p>
+    </div>
+    `;
+  }
+};
 
-// const getPeliculas = async () => {
-//   const input = document.querySelector('button');
-//   console.log(button.value);
-//   const res = await fetch('http://localhost:3000/api/v1/peliculas');
-//   const peliculas = await res.json();
-//   console.log(peliculas);
-// };
-// button.addEventListener('click', getPeliculas);
+document.getElementById('buscar').addEventListener('click', getPeliculas);

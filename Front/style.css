@@ -12,7 +12,7 @@ h2 {
   font-size: 20px;
 }
 
-.peliculas-container {
+.peliculas {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
