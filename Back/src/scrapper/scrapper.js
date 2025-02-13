@@ -2,8 +2,8 @@ const puppeteer = require('puppeteer');
 
 const scrap = async () => {
   const url = 'https://www.sensacine.com/peliculas/en-cartelera/cines/';
-
-  // nuestro buscador
+  const peliculasArray = [];
+  // lanzar puppeteer
   const browser = await puppeteer.launch({
     headless: false,
     //para que se muestre en pantalla completa
@@ -13,7 +13,6 @@ const scrap = async () => {
   // creamos la pagina
   const page = await browser.newPage();
   await page.goto(url);
-  // await page.goto(url, { waitUntil: 'domcontentloaded' });
 
   // Aceptar cookies si el botón existe
   const button = await page.$('.jad_cmp_paywall_button-cookies');
@@ -23,15 +22,17 @@ const scrap = async () => {
   } else {
     console.log('No se encontró el botón de cookies.');
   }
-
-  const peliculasArray = [];
-  //funcion que le ira dando al botón siguiente hasta que no haya más
-  await repeat(page, peliculasArray);
-  console.log(peliculasArray);
-  //cerramos el navegador
-  await browser.close();
+  try {
+    //funcion que le ira dando al botón siguiente hasta que no haya más
+    await repeat(page, peliculasArray);
+    console.log(peliculasArray);
+  } catch (error) {
+    console.error('Error al obtener las películas:', error);
+  } finally {
+    //cerramos el navegador
+    await browser.close();
+  }
 };
-
 //recibimos la pagina y el array de peliculas
 const repeat = async (page, peliculasArray) => {
   //vamos rellenando el array con los datos de las peliculas
@@ -39,17 +40,25 @@ const repeat = async (page, peliculasArray) => {
   await page.waitForSelector('li.mdl', { timeout: 10000 });
   //primero selecionamos donde esta todos los datos
   const peliculas = await page.$$('li.mdl');
+
   //después hacemos un blucle para recorrer todos los datos
   for (const pelicula of peliculas) {
+    let genero;
     let title;
     let portada;
     let sipnosis;
+
+    //vamos a sacar el genero
+    //primero selecionamos donde esta el genero
+    const generoElement = await pelicula.$('.xXx.dark-grey-link');
+    //después sacamos el genero
+    if (generoElement) {
+      genero = await generoElement.evaluate((el) => el.textContent.trim());
+    }
     //vamos a sacar el titulo de la pelicula
-    //primero selecionamos donde esta el titulo
     const titleElement = await pelicula.$(
       '.xXx.thumbnail-container.thumbnail-link'
     );
-    //después sacamos el titulo
     if (titleElement) {
       title = await titleElement.evaluate((el) => el.title);
     }
@@ -66,28 +75,23 @@ const repeat = async (page, peliculasArray) => {
     if (sipnosisElement) {
       sipnosis = await sipnosisElement.evaluate((el) => el.textContent.trim());
     }
-
-    const peliData = {
-      title,
-      portada,
-      sipnosis
-    };
-    peliculasArray.push(peliData);
-    //console.log(peliData);
-    break;
+    peliculasArray.push({ genero, title, portada, sipnosis });
+    console.log(peliculasArray);
   }
   const nextButton = await page.$(
     'a.xXx.button.button-md.button-primary-full.button-right'
   );
   if (nextButton) {
+    console.log(
+      '✔ Botón "Siguiente" encontrado. Pasando a la siguiente página...'
+    );
     await nextButton.click();
-    //esperamos a que cargue la pagina
+    // Asegurarse que las películas están disponibles
+    await page.waitForSelector('li.mdl', { timeout: 10000 });
     await repeat(page, peliculasArray);
   } else {
     console.log('No hay más películas.');
   }
-  console.log(peliculasArray);
 };
 
 module.exports = { scrap };
-// scrap('https://www.sensacine.com/peliculas/en-cartelera/cines/');
