@@ -5,8 +5,11 @@ const buscarpeliculas = async (req, res, next) => {
   try {
     console.log('Obteniendo películas');
     const peliculas = await scrap();
+
+    // Llamamos a la función que guarda las películas en la base de datos
+    await guardarPeliculasEnDB(peliculas);
     res.status(200).json(peliculas);
-    console.log('Películas obtenidas');
+    console.log('Películas obtenidas y guardadas');
   } catch (error) {
     console.log('Error al obtener las películas');
     res.status(500).json({ error: 'Error al obtener las películas' });
@@ -15,17 +18,29 @@ const buscarpeliculas = async (req, res, next) => {
 
 const buscarGenero = async (req, res, next) => {
   try {
-    const { generos } = req.params;
-    const peliculasGenero = await scrap(
-      `https://www.sensacine.com/peliculas/en-cartelera/cines/${generos}`
-    );
+    const { genero } = req.params;
+
+    if (!genero || typeof genero !== 'string') {
+      return res
+        .status(400)
+        .json({ error: 'Debes proporcionar un género válido' });
+    }
+
+    console.log(`🔍 Buscando películas del género: ${genero}`);
+    const peliculasGenero = await scrap(genero.trim());
+
+    if (peliculasGenero.length === 0) {
+      return res
+        .status(404)
+        .json({ mensaje: `No se encontraron películas de género "${genero}"` });
+    }
+
     res.status(200).json(peliculasGenero);
-    console.log('Películas por genero obtenidas');
   } catch (error) {
-    console.log('Error al obtener las películas por genero');
+    console.error('❌ Error al obtener las películas:', error);
     res
       .status(500)
-      .json({ error: 'Error al obtener las películas por genero' });
+      .json({ error: 'Error al obtener las películas por género' });
   }
 };
 
@@ -34,7 +49,7 @@ const guardarPeliculasEnDB = async (peliculasArray) => {
     // Guardar cada película en la base de datos
     for (const pelicula of peliculasArray) {
       const nuevaPelicula = new Peliculas({
-        Género: pelicula.generos,
+        Género: pelicula.generos.join(', '), // Convertir array a string separado por comas
         Título: pelicula.title,
         Pantalla: pelicula.portada,
         Sipnosis: pelicula.sipnosis

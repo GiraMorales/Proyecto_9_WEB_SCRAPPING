@@ -1,5 +1,7 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
+const guardarPeliculasEnDB = require('../api/controlador/peliculas');
+const buscarGenero = require('../api/controlador/peliculas');
 
 const scrap = async () => {
   const url = 'https://www.sensacine.com/peliculas/en-cartelera/cines/';
@@ -27,7 +29,11 @@ const scrap = async () => {
 
   try {
     //funcion que le ira dando al botón siguiente hasta que no haya más
-    await repeat(page, peliculasArray);
+    await repeat(page, peliculasArray, buscarGenero);
+    // Llamamos a la función guardarPeliculasEnDB desde el controlador para guardar las películas en la base de datos
+    await guardarPeliculasEnDB(peliculasArray);
+    //pasarlo al JSON
+    write(peliculasArray);
     console.log('Peliculas extraidas:', peliculasArray);
   } catch (error) {
     console.error('Error al obtener las películas:', error);
@@ -40,35 +46,29 @@ const scrap = async () => {
 };
 
 //recibimos la pagina y el array de peliculas
-const repeat = async (page, peliculasArray) => {
+const repeat = async (page, peliculasArray, buscarGenero) => {
   //vamos rellenando el array con los datos de las peliculas
   //esperamos a que cargue la pagina
-  await page.waitForSelector('li.mdl', { timeout: 10000 });
+  await page.waitForSelector('li.mdl', { timeout: 20000 });
   //primero selecionamos donde esta todos los datos
   const peliculas = await page.$$('li.mdl');
 
   //después hacemos un blucle para recorrer todos los datos
   for (const pelicula of peliculas) {
     let generos = [];
-    let title;
-    let portada;
-    let sipnosis;
+    let title = 'Titulo no encontrado';
+    let portada = 'Portada no disponible';
+    let sipnosis = 'Sin sinopsis';
 
     //vamos a sacar el genero
     //primero selecionamos donde esta el genero
     const generoElements = await pelicula.$$('.xXx.dark-grey-link');
-    if (generoElements && generoElements.length > 0) {
-      //después sacamos los generos
-      for (const gen of generoElements) {
-        let text = await gen.evaluate((el) => el?.textContent?.trim());
-        if (text) generos.push(text);
-      }
-    } else {
-      console.log('No se encontraron generos en esta pelicula');
+    // if (generoElements && generoElements.length > 0) {
+    //después sacamos los generos
+    for (const gen of generoElements) {
+      let text = await gen.evaluate((el) => el.textContent.trim());
+      if (text) generos.push(text);
     }
-    // if (generoElementos) {
-    //   genero = await generoElement.evaluate((el) => el.textContent.trim());
-    // }
     //vamos a sacar el titulo de la pelicula
     const titleElement = await pelicula.$(
       '.xXx.thumbnail-container.thumbnail-link'
@@ -76,7 +76,6 @@ const repeat = async (page, peliculasArray) => {
     if (titleElement) {
       title = await titleElement.evaluate((el) => el.title);
     }
-
     //vamos a sacar la portada de la pelicula
     const portadaElement = await pelicula.$(
       'div.card.entity-card.entity-card-list.cf > figure.thumbnail  > a.xXx.thumbnail-container.thumbnail-link > img.thumbnail-img'
@@ -101,24 +100,22 @@ const repeat = async (page, peliculasArray) => {
     );
     await nextButton.click();
     // Asegurarse que las películas están disponibles
-    await page.waitForSelector('li.mdl', { timeout: 10000 });
-    await repeat(page, peliculasArray);
+    await page.waitForSelector('li.mdl');
+    await repeat(page, peliculasArray, buscarGenero);
   } else {
     console.log('No hay más películas.');
   }
   // Esperar a que la navegación se complete
-  await page.waitForNavigation({ waitUntil: 'networkidle0' });
-  write(peliculasArray);
-  console.log('pasamos a la siguiente página');
-  console.log(`Llevamos ${peliculasArray.length} películas recolectadas`);
-
-  // repeat(page);
+  await page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 30000 });
 };
-
-// Función para escribir el archivo JSON
+//Función para escribir el archivo JSON
 const write = (peliculasArray) => {
-  fs.writeFile('pelis.json', JSON.stringify(peliculasArray, null, 2), () => {
-    console.log('Archivo escrito');
+  fs.writeFile('pelis.json', JSON.stringify(peliculasArray, null, 2), (err) => {
+    if (err) {
+      console.error('Error al escribir el archivo:', err);
+    } else {
+      console.log('Archivo escrito');
+    }
   });
 };
 
