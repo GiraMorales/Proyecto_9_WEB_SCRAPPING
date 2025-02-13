@@ -4,7 +4,7 @@
 
 Web Scraping es una técnica utilizada para extraer información de sitios web. Consiste en el uso de programas o scripts para automatizar la navegación y la recolección de datos de manera eficiente y automatizada. Los datos obtenidos pueden ser utilizados para una variedad de propósitos, como:
 
-- Monitorización de precios.
+- Monitorización de peliculas, pecios.
 - Recopilación de datos para análisis.
 - Generación de contenido automatizado.
 - Análisis de tendencias en redes sociales.
@@ -34,10 +34,8 @@ Mongoose es una librería de Node.js que facilita la interacción con bases de d
 
 ### Peliculas
 
-POST /api/v1/pelicula/:
-GET /api/v1/pelicula/:
-PUT /api/v1/pelicula/:
-DEL /api/v1/pelicula/:
+GET /api/v1/:genero : buscar por genero
+GET /api/v1/peliculas : buscar todas las peliculas
 
 ## Tecnologías Utilizadas
 
@@ -86,15 +84,15 @@ Añadir el script para ejecutar dicho fichor en el package.json
 En nuestro fichero index.js
 
 - Se importan las bibliotecas de Puppeteer y Mongoose al principio del script.
-- Se crea un modelo de datos llamado "Data" utilizando Mongoose, con tres campos: título, portada y sipnosis.
-- Se define una función "connect" para conectarse a la base de datos MongoDB.
-- Se define una función "scrapePeliculas" para extraer los datos de la página web.
+- Se crea un modelo de datos llamado "Data" utilizando Mongoose, con tres campos: género, título, portada y sipnosis.
+- Se define una función "connectDB" para conectarse a la base de datos MongoDB.
+- Se define una función "scrap" para extraer los datos de la página web.
 
-  a. Se llama a la función "connect" para conectarse a la base de datos.
+  a. Se llama a la función "connectDB" para conectarse a la base de datos.
   b. Se inicializa el navegador con Puppeteer y se abre nueva pestaña.
-  c. Se navega a la URL especifica (filmaffinity en este caso) y se realiza una búsqueda en el sitio utilizando la palabra "peliculas".
+  c. Se navega a la URL especifica (sensacine en este caso) y se realiza una búsqueda en el sitio utilizando la palabra "peliculas" o buscando por el género de la película.
   d. Se esprea a que la pagina se cargue y se hace un scroll para ver más resultados de búsqueda.
-  e. Utilizando el método ".$$eval" de Puppeteer se extraen los títulos, portadas y sipnosis de las películas de la página.
+  e. Utilizando el método ".$$eval" de Puppeteer se extraen los géneros, títulos, portadas y sipnosis de las películas de la página.
   f. Se crea un array con los datos extraídos y se convierte en un objeto JSON.
   g. Se guarda el objeto JSON en la base de datos MongoDB.
   h. Se cierra el navegador y se imprime un mensaje de éxito.
