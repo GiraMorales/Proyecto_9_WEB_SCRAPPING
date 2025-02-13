@@ -1,5 +1,4 @@
 const { scrap } = require('../../scrapper/scrapper');
-const puppeteer = require('puppeteer');
 const Peliculas = require('../modelo/peliculas');
 
 const buscarpeliculas = async (req, res, next) => {

@@ -1,5 +1,4 @@
 const puppeteer = require('puppeteer');
-const Peliculas = require('../api/modelo/peliculas');
 
 const scrap = async () => {
   const url = 'https://www.sensacine.com/peliculas/en-cartelera/cines/';
@@ -49,18 +48,22 @@ const repeat = async (page, peliculasArray) => {
 
   //después hacemos un blucle para recorrer todos los datos
   for (const pelicula of peliculas) {
-    let genero;
+    let genero = [];
     let title;
     let portada;
     let sipnosis;
 
     //vamos a sacar el genero
     //primero selecionamos donde esta el genero
-    const generoElement = await pelicula.$('.xXx.dark-grey-link');
-    //después sacamos el genero
-    if (generoElement) {
-      genero = await generoElement.evaluate((el) => el.textContent.trim());
+    const generoElementos = await pelicula.$$('.xXx.dark-grey-link');
+    //después sacamos los generos
+    for (const generoElemento of generoElementos) {
+      let text = await generoElemento.evaluate((el) => textContent.trim());
+      genero.push(text);
     }
+    // if (generoElementos) {
+    //   genero = await generoElement.evaluate((el) => el.textContent.trim());
+    // }
     //vamos a sacar el titulo de la pelicula
     const titleElement = await pelicula.$(
       '.xXx.thumbnail-container.thumbnail-link'
