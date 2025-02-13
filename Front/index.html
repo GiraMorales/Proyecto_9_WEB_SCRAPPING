@@ -3,20 +3,22 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
     <title>Proyecto 9 - Web Scraping</title>
   </head>
   <body>
     <header>
+      <h1>Web Scraping</h1>
       <h2>Acerca del proyecto</h2>
       <p>
         Este proyecto demuestra las tecnicas de scrping sobre una pagina web de
-        peliculas, cogiendo titulo, portada y sipnosis.
+        películas con el botón buscar me muestra los datos recogidos de género,
+        título, portada y sipnosis.
       </p>
     </header>
     <main>
-      <section id="datos">
-        <!-- Aquí se mostrarán los datos extraídos -->
-      </section>
+      <button id="buscar">Buscar</button>
+      <div id="peliculas-container" class="peliculas-container"></div>
     </main>
     <footer>
       <p>&copy; 2025 Proyecto 9 - Web Scraping</p>
