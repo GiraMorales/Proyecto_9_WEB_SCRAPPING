@@ -2,10 +2,10 @@ const mongoose = require('mongoose');
 
 const PeliculaSchema = new mongoose.Schema(
   {
-    Género: { type: String, required: true },
-    Título: { type: String, required: true },
-    Pantalla: { type: String, required: true },
-    Sipnosis: { type: String, required: true }
+    Género: { type: String },
+    Título: { type: String },
+    Pantalla: { type: String },
+    Sipnosis: { type: String }
   },
   {
     timestamps: true,

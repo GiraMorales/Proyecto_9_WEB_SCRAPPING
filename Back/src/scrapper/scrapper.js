@@ -28,35 +28,15 @@ const scrap = async () => {
   try {
     //funcion que le ira dando al botón siguiente hasta que no haya más
     await repeat(page, peliculasArray);
-    console.log(peliculasArray);
+    console.log('Peliculas extraidas:', peliculasArray);
   } catch (error) {
     console.error('Error al obtener las películas:', error);
   } finally {
     //cerramos el navegador
     await browser.close();
   }
-
   //Devolver las peliculas obtenidas
   return peliculasArray;
-};
-
-const guardarPeliculasEnDB = async (peliculasArray) => {
-  try {
-    // Guardar cada película en la base de datos
-    for (const pelicula of peliculasArray) {
-      const nuevaPelicula = new Peliculas({
-        Género: pelicula.genero,
-        Título: pelicula.title,
-        Pantalla: pelicula.portada,
-        Sipnosis: pelicula.sipnosis
-      });
-
-      await nuevaPelicula.save();
-      console.log('Película guardada en la base de datos:', pelicula.title);
-    }
-  } catch (error) {
-    console.error('Error al guardar las películas en la base de datos:', error);
-  }
 };
 
 //recibimos la pagina y el array de peliculas

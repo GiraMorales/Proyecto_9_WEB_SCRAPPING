@@ -2,26 +2,10 @@ const { scrap } = require('../../scrapper/scrapper');
 const puppeteer = require('puppeteer');
 const Peliculas = require('../modelo/peliculas');
 
-// const buscarGenero = async (req, res, next) => {
-//   try {
-//     console.log('Obteniendo películas');
-//     const { genero } = req.params;
-//     const url = `https://www.sensacine.com/peliculas/en-cartelera/cines/${genero}`;
-//     const peliculasGenero = await scrap(url);
-//     res.status(200).json(peliculasGenero);
-//     console.log('Películas por género obtenidas');
-//   } catch (error) {
-//     console.log('Error al obtener las películas por género');
-//     res
-//       .status(500)
-//       .json({ error: 'Error al obtener las películas por género' });
-//   }
-// };
-
 const buscarpeliculas = async (req, res, next) => {
   try {
     console.log('Obteniendo películas');
-    const peliculas = scrap();
+    const peliculas = await scrap();
     res.status(200).json(peliculas);
     console.log('Películas obtenidas');
   } catch (error) {
@@ -29,4 +13,23 @@ const buscarpeliculas = async (req, res, next) => {
     res.status(500).json({ error: 'Error al obtener las películas' });
   }
 };
-module.exports = { buscarpeliculas };
+
+const guardarPeliculasEnDB = async (peliculasArray) => {
+  try {
+    // Guardar cada película en la base de datos
+    for (const pelicula of peliculasArray) {
+      const nuevaPelicula = new Peliculas({
+        Género: pelicula.genero,
+        Título: pelicula.title,
+        Pantalla: pelicula.portada,
+        Sipnosis: pelicula.sipnosis
+      });
+
+      await nuevaPelicula.save();
+      console.log('Película guardada en la base de datos:', pelicula.title);
+    }
+  } catch (error) {
+    console.error('Error al guardar las películas en la base de datos:', error);
+  }
+};
+module.exports = { buscarpeliculas, guardarPeliculasEnDB };
