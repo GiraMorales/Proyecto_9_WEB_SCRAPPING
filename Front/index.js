@@ -1,15 +1,11 @@
+const button = document.querySelector('button');
 const getPeliculas = async () => {
-  // const input = document.querySelector('#buscar');
-  // console.log(button.value);
-  try {
-    const res = await fetch(`http://localhost:3000/api/v1/peliculas`);
-    if (!res.ok) throw new Error('Error al obtener las películas');
-    const peliculas = await res.json();
-    console.log(peliculas);
-    pintarPeliculas(peliculas);
-  } catch (error) {
-    console.error('❌ Error en la petición:', error);
-  }
+  const input = document.querySelector('.buscar');
+  console.log(button.value);
+
+  const res = await fetch(`http://localhost:3000/api/v1/${input.value}`);
+  const peliculas = await res.json();
+  pintarPeliculas(peliculas);
 };
 
 const pintarPeliculas = (peliculas) => {
@@ -33,5 +29,4 @@ const pintarPeliculas = (peliculas) => {
     `;
   }
 };
-
-document.getElementById('buscar').addEventListener('click', getPeliculas);
+button.addEventListener('click', getPeliculas);

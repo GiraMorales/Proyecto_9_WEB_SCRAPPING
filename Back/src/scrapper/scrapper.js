@@ -1,4 +1,5 @@
 const puppeteer = require('puppeteer');
+const fs = require('fs');
 
 const scrap = async () => {
   const url = 'https://www.sensacine.com/peliculas/en-cartelera/cines/';
@@ -48,18 +49,22 @@ const repeat = async (page, peliculasArray) => {
 
   //después hacemos un blucle para recorrer todos los datos
   for (const pelicula of peliculas) {
-    let genero = [];
+    let generos = [];
     let title;
     let portada;
     let sipnosis;
 
     //vamos a sacar el genero
     //primero selecionamos donde esta el genero
-    const generoElementos = await pelicula.$$('.xXx.dark-grey-link');
-    //después sacamos los generos
-    for (const generoElemento of generoElementos) {
-      let text = await generoElemento.evaluate((el) => textContent.trim());
-      genero.push(text);
+    const generoElements = await pelicula.$$('.xXx.dark-grey-link');
+    if (generoElements && generoElements.length > 0) {
+      //después sacamos los generos
+      for (const gen of generoElements) {
+        let text = await gen.evaluate((el) => el?.textContent?.trim());
+        if (text) generos.push(text);
+      }
+    } else {
+      console.log('No se encontraron generos en esta pelicula');
     }
     // if (generoElementos) {
     //   genero = await generoElement.evaluate((el) => el.textContent.trim());
@@ -84,7 +89,7 @@ const repeat = async (page, peliculasArray) => {
     if (sipnosisElement) {
       sipnosis = await sipnosisElement.evaluate((el) => el.textContent.trim());
     }
-    peliculasArray.push({ genero, title, portada, sipnosis });
+    peliculasArray.push({ generos, title, portada, sipnosis });
     console.log(peliculasArray);
   }
   const nextButton = await page.$(
@@ -101,6 +106,20 @@ const repeat = async (page, peliculasArray) => {
   } else {
     console.log('No hay más películas.');
   }
+  // Esperar a que la navegación se complete
+  await page.waitForNavigation({ waitUntil: 'networkidle0' });
+  write(peliculasArray);
+  console.log('pasamos a la siguiente página');
+  console.log(`Llevamos ${peliculasArray.length} películas recolectadas`);
+
+  // repeat(page);
+};
+
+// Función para escribir el archivo JSON
+const write = (peliculasArray) => {
+  fs.writeFile('pelis.json', JSON.stringify(peliculasArray, null, 2), () => {
+    console.log('Archivo escrito');
+  });
 };
 
 module.exports = { scrap };
