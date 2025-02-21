@@ -2,10 +2,10 @@ const mongoose = require('mongoose');
 
 const PeliculaSchema = new mongoose.Schema(
   {
-    Género: { type: String },
-    Título: { type: String },
-    Pantalla: { type: String },
-    Sipnosis: { type: String }
+    genero: { type: String },
+    titulo: { type: String },
+    portada: { type: String },
+    sipnosis: { type: String }
   },
   {
     timestamps: true,

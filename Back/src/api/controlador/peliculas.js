@@ -49,10 +49,10 @@ const guardarPeliculasEnDB = async (peliculasArray) => {
     // Guardar cada película en la base de datos
     for (const pelicula of peliculasArray) {
       const nuevaPelicula = new Peliculas({
-        Género: pelicula.generos.join(', '), // Convertir array a string separado por comas
-        Título: pelicula.title,
-        Pantalla: pelicula.portada,
-        Sipnosis: pelicula.sipnosis
+        genero: pelicula.generos.join(', '), // Convertir array a string separado por comas
+        titulo: pelicula.title,
+        portada: pelicula.portada,
+        sipnosis: pelicula.sipnosis
       });
 
       await nuevaPelicula.save();

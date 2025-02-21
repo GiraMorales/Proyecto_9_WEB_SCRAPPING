@@ -1,11 +1,21 @@
 const button = document.querySelector('button');
 const getPeliculas = async () => {
-  const input = document.querySelector('.buscar');
-  console.log(button.value);
+  try {
+    const input = document.querySelector('.buscar');
+    console.log('🔍 Buscando:', input.value);
 
-  const res = await fetch(`http://localhost:3000/api/v1/${input.value}`);
-  const peliculas = await res.json();
-  pintarPeliculas(peliculas);
+    const res = await fetch(
+      `http://localhost:3000/api/v1/peliculas/${input.value}`
+    );
+    if (!res.ok) throw new Error(`Error en la petición: ${res.status}`);
+
+    const peliculas = await res.json();
+    console.log('📥 Películas recibidas:', peliculas);
+
+    pintarPeliculas(peliculas);
+  } catch (error) {
+    console.error('❌ Error al obtener las películas:', error);
+  }
 };
 
 const pintarPeliculas = (peliculas) => {
@@ -19,12 +29,12 @@ const pintarPeliculas = (peliculas) => {
   for (const pelicula of peliculas) {
     divPeliculas.innerHTML += `
     <div class= "pelicula">
-    <h3>${pelicula.Titulo}</h3>
-    <img src="${pelicula.Portada}" alt="${pelicula.Titulo}">
+    <h3>${pelicula.title || 'Título no disponible'}</h3>
+    <img src="${pelicula.portada}" alt="${pelicula.title}">
     <p><strong>Género:</strong> ${
-      pelicula.Genero ? pelicula.Genero.join(', ') : 'No disponible'
+      pelicula.generos ? pelicula.generos.join(', ') : 'No disponible'
     }</p>
-     <p>${pelicula.Sinopsis}</p>
+     <p>${pelicula.sipnosis} || 'Descripción no disponible'</p>
     </div>
     `;
   }

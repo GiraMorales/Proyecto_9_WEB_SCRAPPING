@@ -6,6 +6,6 @@ const {
 const PeliculasRoutes = require('express').Router();
 
 PeliculasRoutes.get('/peliculas', buscarpeliculas, guardarPeliculasEnDB);
-PeliculasRoutes.get('/:generos', buscarGenero);
+PeliculasRoutes.get('/peliculas/:generos', buscarGenero);
 
 module.exports = PeliculasRoutes;
