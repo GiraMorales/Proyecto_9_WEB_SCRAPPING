@@ -3,7 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const { connectDB } = require('./src/config/db');
 const PeliculasRoutes = require('./src/api/rutas/peliculas');
-const PORT = 3000;
+const PORT = 3001;
 
 const app = express();
 connectDB();

@@ -18,8 +18,24 @@
       </p>
     </header>
     <main>
-      <input class="buscar" />
-      <button>Buscar</button>
+      <input
+        type="text"
+        id="inputBusqueda"
+        class="buscar"
+        placeholder="Buscar por nombre de película"
+      />
+
+      <select id="genero-select" class="genero-select">
+        <option value="">Seleccionar Género</option>
+        <option value="13001">Aventura</option>
+        <option value="13005">Comedia</option>
+        <option value="13008">Drama</option>
+        <option value="13009">Terror</option>
+        <option value="13012">Fantasia</option>
+        <option value="13024">Romántico</option>
+        <option value="13025">Acción</option>
+      </select>
+      <button id="btnBuscar">Buscar</button>
       <div id="peliculas" class="peliculas"></div>
     </main>
     <footer>
