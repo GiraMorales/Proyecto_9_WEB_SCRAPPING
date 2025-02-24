@@ -2,6 +2,7 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 const guardarPeliculasEnDB = require('../api/controlador/peliculas');
 const buscarGenero = require('../api/controlador/peliculas');
+const Peliculas = require('../api/modelo/peliculas');
 
 const scrap = async () => {
   const url = 'https://www.sensacine.com/peliculas/en-cartelera/cines/';
@@ -94,6 +95,7 @@ const repeat = async (page, peliculasArray, buscarGenero) => {
   const nextButton = await page.$(
     'a.xXx.button.button-md.button-primary-full.button-right'
   );
+
   if (nextButton) {
     console.log(
       '✔ Botón "Siguiente" encontrado. Pasando a la siguiente página...'
@@ -105,18 +107,11 @@ const repeat = async (page, peliculasArray, buscarGenero) => {
   } else {
     console.log('No hay más películas.');
   }
+  fs.writeFile('./peliculas.json', JSON.stringify(peliculasArray), () => {
+    console.log('se escriben los datos');
+  });
   // Esperar a que la navegación se complete
   await page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 30000 });
-};
-//Función para escribir el archivo JSON
-const write = (peliculasArray) => {
-  fs.writeFile('pelis.json', JSON.stringify(peliculasArray, null, 2), (err) => {
-    if (err) {
-      console.error('Error al escribir el archivo:', err);
-    } else {
-      console.log('Archivo escrito');
-    }
-  });
 };
 
 module.exports = { scrap };

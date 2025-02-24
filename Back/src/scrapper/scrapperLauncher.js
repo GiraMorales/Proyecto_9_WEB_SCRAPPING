@@ -1,3 +1,11 @@
 const { scrap } = require('./scrapper');
 
-scrap('https://www.sensacine.com/peliculas/en-cartelera/cines/');
+// scrap();
+
+const launchScraper = async () => {
+  console.log('Lanzando el scraper...');
+  await scrap();
+  console.log('Scraper finalizado.');
+};
+
+module.exports = launchScraper;
