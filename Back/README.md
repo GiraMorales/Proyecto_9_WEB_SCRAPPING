@@ -106,3 +106,7 @@ En nuestro fichero index.js
 `Para levantar la base de datos`
 
 - "dev": "nodemon index.js"
+
+`Para ejecutar el scrapper  index.js`
+
+- "scrap": "node ./src/scrapper/scrapperLauncher.js"
