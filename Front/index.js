@@ -2,11 +2,23 @@ const button = document.querySelector('button');
 const getPeliculas = async () => {
   try {
     const input = document.querySelector('.buscar');
-    console.log('🔍 Buscando:', input.value);
+    const generoSelect = document.querySelector('.genero-select');
+    const nombrePelicula = input.value.trim();
+    const genero = generoSelect.value;
 
-    const res = await fetch(
-      `http://localhost:3000/api/v1/peliculas/${input.value}`
-    );
+    console.log('🔍 Buscando:', input.value);
+    console.log('🎬 Género seleccionado:', genero);
+
+    let url = `http://localhost:3000/api/v1/peliculas`;
+    if (genero) {
+      url += `/${genero}`;
+    } else if (nombrePelicula) {
+      url += `/${nombrePelicula}`;
+    }
+
+    console.log('🌐 URL de la solicitud:', url);
+
+    const res = await fetch(url);
     if (!res.ok) throw new Error(`Error en la petición: ${res.status}`);
 
     const peliculas = await res.json();
@@ -28,15 +40,16 @@ const pintarPeliculas = (peliculas) => {
   divPeliculas.innerHTML = '';
   for (const pelicula of peliculas) {
     divPeliculas.innerHTML += `
-    <div class= "pelicula">
-    <h3>${pelicula.title || 'Título no disponible'}</h3>
-    <img src="${pelicula.portada}" alt="${pelicula.title}">
-    <p><strong>Género:</strong> ${
-      pelicula.generos ? pelicula.generos.join(', ') : 'No disponible'
-    }</p>
-     <p>${pelicula.sipnosis} || 'Descripción no disponible'</p>
+    <div class="pelicula">
+      <h3>${pelicula.title || 'Título no disponible'}</h3>
+      <img src="${pelicula.portada}" alt="${pelicula.title}">
+      <p><strong>Género:</strong> ${
+        pelicula.generos ? pelicula.generos.join(', ') : 'No disponible'
+      }</p>
+      <p>${pelicula.sipnosis || 'Descripción no disponible'}</p>
     </div>
     `;
   }
 };
+
 button.addEventListener('click', getPeliculas);

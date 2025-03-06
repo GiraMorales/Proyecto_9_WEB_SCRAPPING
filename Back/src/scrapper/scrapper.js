@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 const guardarPeliculasEnDB = require('../api/controlador/peliculas');
 const buscarGenero = require('../api/controlador/peliculas');
-const Peliculas = require('../api/modelo/peliculas');
+// const Peliculas = require('../api/modelo/peliculas');
 
 const scrap = async () => {
   const url = 'https://www.sensacine.com/peliculas/en-cartelera/cines/';
@@ -111,7 +111,7 @@ const repeat = async (page, peliculasArray, buscarGenero) => {
     console.log('se escriben los datos');
   });
   // Esperar a que la navegación se complete
-  await page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 30000 });
+  await page.waitForSelector('li.mdl', { timeout: 20000 });
 };
 
 module.exports = { scrap };
